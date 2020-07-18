@@ -1,0 +1,8 @@
+[package]
+authors = ["Wes Hardee"]
+edition = "2018"
+name = "peg-game"
+version = "0.1.0"
+
+[dependencies]
+kit = {path = "../kit"}
