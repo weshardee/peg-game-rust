@@ -5,4 +5,6 @@ name = "peg-game"
 version = "0.1.0"
 
 [dependencies]
-kit = {path = "../kit"}
+kit = {version = "0.0", path = "../kit"}
+rand = "0.7"
+shortid = "1.0"

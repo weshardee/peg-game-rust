@@ -1,37 +1,35 @@
-use duckSVG from 'crate::yellow/duck.svg';
-use frontSVG from 'crate::yellow/front.svg';
-use jumpSVG from 'crate::yellow/jump.svg';
-use leanSVG from 'crate::yellow/lean.svg';
-use hurtSVG from 'crate::yellow/hurt.svg';
+const DUCK_SVG: &str = "yellow/duck.svg";
+const FRONT_SVG: &str = "yellow/front.svg";
+const JUMP_SVG: &str = "yellow/jump.svg";
+const LEAN_SVG: &str = "yellow/lean.svg";
+const HURT_SVG: &str = "yellow/hurt.svg";
 
-use type { Sheet } from 'crate::peg';
+use crate::sprites::peg::PegSheet;
 
-const yellow: Sheet = {
-  duck: {
-    src: duckSVG,
-    size: { w: 68, h: 67 },
-    pivot: { x: 0.397059, y: 1 },
+const YELLOW: PegSheet = PegSheet {
+  duck: PegFrame {
+    src: duck_SVG,
+    size: PegFrameSize { w: 68, h: 67 },
+    pivot: v2(0.397059, 1.0),
   },
-  front: {
-    src: frontSVG,
-    size: { w: 66, h: 82 },
-    pivot: { x: 0.484848, y: 1 },
+  front: PegFrame {
+    src: front_SVG,
+    size: PegFrameSize { w: 66, h: 82 },
+    pivot: v2(0.484848, 1.0),
   },
-  hurt: {
-    src: hurtSVG,
-    size: { w: 69, h: 81 },
-    pivot: { x: 0.623188, y: 1 },
+  hurt: PegFrame {
+    src: hurt_SVG,
+    size: PegFrameSize { w: 69, h: 81 },
+    pivot: v2(0.623188, 1.0),
   },
-  jump: {
-    src: jumpSVG,
-    size: { w: 67, h: 83 },
-    pivot: { x: 0.447761, y: 1 },
+  jump: PegFrame {
+    src: jump_SVG,
+    size: PegFrameSize { w: 67, h: 83 },
+    pivot: v2(0.447761, 1.0),
   },
-  lean: {
-    src: leanSVG,
-    size: { w: 66, h: 82 },
-    pivot: { x: 0.424242, y: 1 },
+  lean: PegFrame {
+    src: lean_SVG,
+    size: PegFrameSize { w: 66, h: 82 },
+    pivot: v2(0.424242, 1.0),
   },
 };
-
-pub default yellow;
