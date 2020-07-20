@@ -26,11 +26,7 @@ pub fn draw(ctx: &mut Ctx, state: &State) {
           PegType::Pink => &state.sprites.peg_pink,
           PegType::Yellow => &state.sprites.peg_yellow,
         };
-        let sprite = sheet.jump;
-        let sprite = sheet.hurt;
         let sprite = sheet.front;
-        let sprite = sheet.lean;
-        let sprite = sheet.duck;
         kit::graphics::draw_sprite(ctx, sprite, pos, scale);
       }
     }

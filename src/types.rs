@@ -45,6 +45,13 @@ pub enum Phase {
   Excited,
 }
 
+impl Default for Phase {
+  fn default() -> Self {
+    // TODO should be ready, but starting in Picking for testing purposes
+    Phase::Picking
+  }
+}
+
 #[derive(Copy, Clone, Default)]
 pub struct Coords {
   pub x: i32,
@@ -115,4 +122,5 @@ pub struct State {
   pub board: Board,
   pub assets: Assets,
   pub sprites: Sprites,
+  pub phase: Phase,
 }

@@ -60,6 +60,25 @@ impl KApp for App {
 
   fn frame(&mut self, ctx: &mut Ctx) {
     let state = &mut self.state;
+
+    if ctx.input.mouse.left.downs > 0 {
+      // TODO match game phase... try to do something
+      match state.phase {
+        Phase::Ready => {
+          // TODO
+        }
+        Phase::Picking => {
+          // TODO check if mouse was over a peg
+          // TODO if over a peg & moveable: excite it
+          // TODO if over a peg & unmoveable: buzz it
+          println!("mouse pressed! {}", ctx.input.mouse.pos);
+        }
+        Phase::Excited => {
+          // TODO
+        }
+      }
+    }
+
     draw::draw(ctx, state);
   }
 }
