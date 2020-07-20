@@ -1,7 +1,7 @@
 use crate::board::Board;
 use crate::constants::*;
 use crate::types::Coords;
-use kit::math::*;
+use kit::*;
 
 pub fn get_middle_position(a: Coords, b: Coords) -> Coords {
   let delta_x = a.x - b.x;
@@ -54,7 +54,7 @@ fn board_to_screen_position_offset_x(y: i32) -> f32 {
 
 pub fn board_to_screen_position(pos: Coords) -> V2 {
   let offset_x = board_to_screen_position_offset_x(pos.y);
-  let offset_y = BOARD_SIZE as f32 * BOARD_CELL_HEIGHT_PX_HALF - 80.0;
+  let offset_y = BOARD_SIZE as f32 * BOARD_CELL_HEIGHT_PX_HALF - 60.0;
   v2(
     pos.x as f32 * BOARD_CELL_WIDTH_PX + offset_x,
     -pos.y as f32 * BOARD_CELL_HEIGHT_PX + offset_y,

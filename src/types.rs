@@ -1,26 +1,13 @@
 use crate::board::Board;
-use kit::math::*;
+use kit::*;
 use rand::distributions::Distribution;
 use rand::distributions::Standard;
 use rand::Rng;
 use std::collections::HashMap;
 use std::ops::Add;
+use std::time::Duration;
 
 pub type EntityID = String;
-
-// pub enum Action {
-//   Touch,
-//   Wipe,
-//   Populate(Vec<Peg>),
-//   Excite(String),
-//   Buzz(String),
-//   Move {
-//     id: String,
-//     from: Coords,
-//     to: Coords,
-//     kill: Peg,
-//   },
-// }
 
 pub enum PegState {
   Front,
@@ -80,36 +67,52 @@ impl Add for Coords {
   }
 }
 
-pub struct Peg {
-  pub id: String,
-  pub pos: Coords,
-  pub peg_type: PegType,
+pub enum PegFrame {
+  Duck,
+  Front,
+  Hurt,
+  Jump,
+  Lean,
 }
 
-// pub struct SimpleSpritesheet {
-//   : str,
-//   width: usize,
-//   height: usize,
-// }
-
-pub struct PegFrameSize {
-  pub w: usize,
-  pub h: usize,
-}
-
-pub struct PegFrame {
-  // src: str,
-  size: PegFrameSize,
-  // pivot: V2
+impl Default for PegFrame {
+  fn default() -> Self {
+    PegFrame::Front
+  }
 }
 
 #[derive(Default)]
 pub struct Assets {
-  pub tile: Option<kit::Texture>,
+  pub tile: Option<Texture>,
+  pub shadow: Option<Texture>,
+  pub peg_beige: Option<Texture>,
+  pub peg_blue: Option<Texture>,
+  pub peg_green: Option<Texture>,
+  pub peg_pink: Option<Texture>,
+  pub peg_yellow: Option<Texture>,
+}
+
+#[derive(Default)]
+pub struct PegSheet {
+  pub duck: Sprite,
+  pub front: Sprite,
+  pub hurt: Sprite,
+  pub jump: Sprite,
+  pub lean: Sprite,
+}
+
+#[derive(Default)]
+pub struct Sprites {
+  pub peg_beige: PegSheet,
+  pub peg_blue: PegSheet,
+  pub peg_green: PegSheet,
+  pub peg_pink: PegSheet,
+  pub peg_yellow: PegSheet,
 }
 
 #[derive(Default)]
 pub struct State {
   pub board: Board,
   pub assets: Assets,
+  pub sprites: Sprites,
 }
