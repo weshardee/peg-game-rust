@@ -33,7 +33,7 @@ pub fn go(store: Store, peg_id: String, to: Coords) -> Action {
   if !from || board.get(to) {
     return buzz(peg_id);
   }
-  let middlePos = get_middle_position(from, to);
+  let middlePos = middle_position(from, to);
   let middleID = board.get(middlePos);
   if !middleID {
     return buzz(peg_id);

@@ -1,6 +1,8 @@
 use crate::board::board_iterator;
 use crate::types::*;
-use kit::*;
+use kit;
+use kit::Ctx;
+use kit::Pivot;
 
 pub fn draw(ctx: &mut Ctx, state: &State) {
   // TODO death animation
@@ -9,17 +11,17 @@ pub fn draw(ctx: &mut Ctx, state: &State) {
   // TODO excited animation (indicates a peg is selected)
 
   for pos in board_iterator() {
-    let peg_type = state.board.get(pos);
-    match peg_type {
+    let peg_i = state.board.get(pos);
+    match peg_i {
       None => {}
-      Some(peg_type) => {
+      Some(peg_i) => {
         let pos = crate::utils::board_to_screen_position(pos);
         let shadow_img_id = state.assets.shadow.unwrap().id;
         let scale = 1.0;
         let pivot = Pivot::Center;
-        kit::graphics::draw_image(ctx, shadow_img_id, pos, scale, pivot);
-
-        let sheet = match peg_type {
+        kit::draw_image(ctx, shadow_img_id, pos, scale, pivot);
+        let peg_type = state.pegs.peg_type[peg_i];
+        let sheet = match state.pegs.peg_type[peg_i] {
           PegType::Beige => &state.sprites.peg_beige,
           PegType::Blue => &state.sprites.peg_blue,
           PegType::Green => &state.sprites.peg_green,
@@ -27,7 +29,7 @@ pub fn draw(ctx: &mut Ctx, state: &State) {
           PegType::Yellow => &state.sprites.peg_yellow,
         };
         let sprite = sheet.front;
-        kit::graphics::draw_sprite(ctx, sprite, pos, scale);
+        kit::draw_sprite(ctx, sprite, pos, scale);
       }
     }
   }

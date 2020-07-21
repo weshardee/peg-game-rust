@@ -1,5 +1,5 @@
 use crate::types::*;
-use kit::graphics::sprite;
+use kit::sprite;
 use kit::*;
 
 pub fn init(ctx: &mut Ctx, state: &mut State) {

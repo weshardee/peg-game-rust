@@ -3,7 +3,7 @@ use crate::constants::BOARD_SIZE;
 use crate::types::Coords;
 use crate::types::PegType;
 
-type Slot = Option<PegType>;
+type Slot = Option<usize>;
 
 fn board_i(pos: Coords) -> usize {
   let x = pos.x;
@@ -69,9 +69,13 @@ impl Board {
     self.e[i] = item;
   }
 
-  pub fn get(&self, pos: Coords) -> Option<PegType> {
+  pub fn get(&self, pos: Coords) -> Option<usize> {
     let i = board_i(pos);
     self.e[i]
+  }
+
+  pub fn iterator(&self) -> BoardIterator {
+    Default::default()
   }
 }
 

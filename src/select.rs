@@ -7,7 +7,7 @@ const END_MESSAGES: [&str; 4] = [
   "Just Plain Eg-no-ra-moose",
 ];
 
-pub fn get_game_over_message(state: State) {
+pub fn game_over_message(state: State) {
   let num_pegs = selectors::num_pegs(state),
   if numPegs < END_MESSAGES.length
       { END_MESSAGES[numPegs]}

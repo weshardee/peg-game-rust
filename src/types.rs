@@ -1,14 +1,17 @@
 use crate::board::Board;
+use crate::constants::MAX_PEGS;
 use kit::*;
 use rand::distributions::Distribution;
 use rand::distributions::Standard;
 use rand::Rng;
 use std::collections::HashMap;
+use std::fmt::Display;
 use std::ops::Add;
 use std::time::Duration;
 
 pub type EntityID = String;
 
+#[derive(Copy, Clone)]
 pub enum PegState {
   Front,
   Lean,
@@ -42,7 +45,7 @@ impl Distribution<PegType> for Standard {
 pub enum Phase {
   Ready,
   Picking,
-  Excited,
+  Excited(Coords),
 }
 
 impl Default for Phase {
@@ -52,15 +55,21 @@ impl Default for Phase {
   }
 }
 
-#[derive(Copy, Clone, Default)]
+#[derive(Copy, Clone, Default, PartialEq)]
 pub struct Coords {
   pub x: i32,
   pub y: i32,
 }
 
-impl Into<V2> for Coords {
-  fn into(self) -> V2 {
-    v2(self.x as f32, self.y as f32)
+impl Display for Coords {
+  fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::result::Result<(), std::fmt::Error> {
+    write!(f, "Coords({}, {})", self.x, self.y)
+  }
+}
+
+impl Into<Vec2> for Coords {
+  fn into(self) -> Vec2 {
+    vec2(self.x as f32, self.y as f32)
   }
 }
 
@@ -117,10 +126,27 @@ pub struct Sprites {
   pub peg_yellow: PegSheet,
 }
 
+pub struct Pegs {
+  pub peg_type: [PegType; MAX_PEGS],
+  pub state: [PegState; MAX_PEGS],
+}
+
+impl Default for Pegs {
+  fn default() -> Self {
+    Self {
+      peg_type: [PegType::Beige; MAX_PEGS],
+      state: [PegState::Front; MAX_PEGS],
+    }
+  }
+}
+
 #[derive(Default)]
 pub struct State {
-  pub board: Board,
-  pub assets: Assets,
-  pub sprites: Sprites,
-  pub phase: Phase,
+  pub board: Board,             // mapping of board positions to peg_i
+  pub assets: Assets,           // loaded assets for rendering
+  pub sprites: Sprites,         // asset metadata for rendering
+  pub phase: Phase,             // major game phase
+  pub mouse_pos: Vec2,          // mouse position in world space
+  pub over_peg: Option<Coords>, // peg coords if mouse is over one
+  pub pegs: Pegs,               // peg properties types by peg_i
 }

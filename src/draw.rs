@@ -1,3 +1,4 @@
+mod debug;
 mod gui;
 mod pegs;
 mod tiles;
@@ -8,9 +9,9 @@ use crate::types::State;
 use kit::*;
 
 pub fn draw(ctx: &mut Ctx, state: &State) {
-  // TODO rename to something like `project_2d(ctx, world_w, world_h)`
-  kit::graphics::default_projection(ctx);
+  kit::default_projection_2d(ctx);
   tiles::draw(ctx, state);
   pegs::draw(ctx, state);
   gui::draw(ctx, state);
+  debug::draw(ctx, state);
 }

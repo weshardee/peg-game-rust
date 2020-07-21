@@ -4,6 +4,7 @@ use kit::*;
 pub const BOARD_SIZE: i32 = 5;
 pub const BOARD_SIZE_HALF: i32 = BOARD_SIZE / 2;
 pub const BOARD_NUM_SPACES: usize = BOARD_SIZE as usize * 3;
+pub const MAX_PEGS: usize = BOARD_NUM_SPACES - 1;
 
 pub const BOARD_CELL_WIDTH_PX: f32 = 92.0;
 pub const BOARD_CELL_WIDTH_PX_HALF: f32 = BOARD_CELL_WIDTH_PX / 2.0;
@@ -21,4 +22,4 @@ pub const RESET_URI: &str = "/assets/images/return.png";
 // death animation
 pub const DEATH_DURATION: u32 = 200;
 pub const DEATH_ALPHA: f32 = 0.0;
-pub const DEATH_SCALE: V2 = V2::ZERO;
+// pub const DEATH_SCALE: Vec2 = vec2(0.0, 0.0);
