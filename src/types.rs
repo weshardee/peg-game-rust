@@ -14,10 +14,10 @@ pub type EntityID = String;
 #[derive(Copy, Clone)]
 pub enum PegState {
   Front,
-  Lean,
+  Excited,
+  Buzz,
   Jump,
-  Duck,
-  Hurt,
+  Death,
 }
 
 #[derive(Copy, Clone)]

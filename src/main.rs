@@ -123,7 +123,8 @@ fn process_phase(ctx: &Ctx, state: &mut State) {
 
 fn process_phase_picking(ctx: &Ctx, state: &mut State) {
   // TODO clicks aren't always registering, but only when not plugged in? Debug this!
-  if ctx.input.mouse.left.down > 0 {
+  let click = ctx.input.mouse.left.down > 0;
+  if click {
     let picked_peg = state.over_peg;
     match picked_peg {
       None => {}
@@ -132,10 +133,11 @@ fn process_phase_picking(ctx: &Ctx, state: &mut State) {
         let valid = has_valid_moves(&state.board, pos);
         if valid {
           state.phase = Phase::Excited(pos);
+          state.pegs.state[peg_i] = PegState::Excited;
         } else {
-          state.pegs.state[peg_i] = PegState::Hurt;
-          // TODO buzz peg with no moves
+          state.pegs.state[peg_i] = PegState::Buzz;
           // TODO audio
+          // TODO buzz animation
         }
       }
     }

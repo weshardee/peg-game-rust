@@ -21,14 +21,20 @@ pub fn draw(ctx: &mut Ctx, state: &State) {
         let pivot = Pivot::Center;
         kit::draw_image(ctx, shadow_img_id, pos, scale, pivot);
         let peg_type = state.pegs.peg_type[peg_i];
-        let sheet = match state.pegs.peg_type[peg_i] {
+        let peg_state = state.pegs.state[peg_i];
+        let sheet = match peg_type {
           PegType::Beige => &state.sprites.peg_beige,
           PegType::Blue => &state.sprites.peg_blue,
           PegType::Green => &state.sprites.peg_green,
           PegType::Pink => &state.sprites.peg_pink,
           PegType::Yellow => &state.sprites.peg_yellow,
         };
-        let sprite = sheet.front;
+        let sprite = match peg_state {
+          PegState::Front => sheet.front,
+          PegState::Buzz => sheet.hurt,
+          PegState::Excited => sheet.lean,
+          _ => sheet.duck,
+        };
         kit::draw_sprite(ctx, sprite, pos, scale);
       }
     }
