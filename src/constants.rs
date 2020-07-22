@@ -31,7 +31,7 @@ pub const FALLING_SPRING_DESC: SpringDesc = SpringDesc {
 };
 
 pub const DROP_GRAVITY_PER_DT: f32 = -0.6;
-pub const DROP_BOUNCE_DAMPENING: f32 = 0.5;
+pub const DROP_BOUNCE_DAMPENING: f32 = 0.3;
 pub const DROP_HEIGHT_MIN: f32 = 300.0;
 pub const DROP_HEIGHT_VARIANCE: f32 = 400.0;
 pub const DROP_TERMINAL_VEL: f32 = 20.0;
