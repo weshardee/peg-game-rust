@@ -13,5 +13,5 @@ pub fn draw(ctx: &mut Ctx, state: &State) {
   tiles::draw(ctx, state);
   pegs::draw(ctx, state);
   gui::draw(ctx, state);
-  // debug::draw(ctx, state);
+  debug::draw(ctx, state);
 }

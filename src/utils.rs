@@ -84,15 +84,16 @@ pub fn test_peg(ctx: &Ctx, board_pos: Coords, peg_type: PegType, p: Vec2) -> boo
 }
 
 pub fn peg_bounds(ctx: &Ctx, pos: Coords, peg_type: PegType) -> (Circle, Rect, Circle) {
-  let r = 36.0;
+  let r = 40.0;
+  let bottom_offset = 14.0;
   let height = match peg_type {
-    PegType::Beige => 50.0,
-    PegType::Pink => 50.0,
-    PegType::Yellow => 40.0,
-    PegType::Green => 50.0,
-    PegType::Blue => 50.0,
+    PegType::Beige => 60.0 - bottom_offset,
+    PegType::Pink => 60.0 - bottom_offset,
+    PegType::Yellow => 50.0 - bottom_offset,
+    PegType::Green => 60.0 - bottom_offset,
+    PegType::Blue => 60.0 - bottom_offset,
   };
-  let base = board_to_screen_position(pos) + vec2(0.0, 10.0);
+  let base = board_to_screen_position(pos) + vec2(0.0, bottom_offset);
   let top = base + vec2(0.0, height);
   let center = top;
   // TODO would be nice if we implemented positional add
