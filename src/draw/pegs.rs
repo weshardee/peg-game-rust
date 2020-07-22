@@ -37,7 +37,9 @@ pub fn draw(ctx: &mut Ctx, state: &State) {
           PegType::Yellow => &state.sprites.peg_yellow,
         };
         let lean = match peg_state {
-          PegState::Buzz => (peg_animation_frame as f32 / BUZZ_STATE_DURATION as f32 * TAU).sin(),
+          PegState::Buzz => {
+            (peg_animation_frame as f32 / BUZZ_STATE_DURATION as f32 * TAU * 2.0).sin()
+          }
           _ => 0.0,
         };
         let sprite = sprite(sheet, lean, peg_z, peg_z_vel);
@@ -58,7 +60,11 @@ fn sprite(sheet: &PegSheet, lean: f32, z: f32, z_vel: f32) -> Sprite {
   let grounded = near_zero(z) && near_zero(z_vel);
   if grounded {
     if lean.abs() > LEAN_THRESHOLD {
-      return sheet.lean;
+      if lean < 0.0 {
+        return sheet.lean.flip_x();
+      } else {
+        return sheet.lean;
+      }
     } else {
       return sheet.front;
     }

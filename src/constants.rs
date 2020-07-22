@@ -24,7 +24,7 @@ pub const DEATH_DURATION: u32 = 200;
 pub const DEATH_ALPHA: f32 = 0.0;
 // pub const DEATH_SCALE: Vec2 = vec2(0.0, 0.0);
 
-pub const BUZZ_STATE_DURATION: u32 = 30; // frames
+pub const BUZZ_STATE_DURATION: u32 = 20; // frames
 pub const FALLING_SPRING_DESC: SpringDesc = SpringDesc {
   stiffness: 100.0,
   damping: 10.0,
