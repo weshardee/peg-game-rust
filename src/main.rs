@@ -1,6 +1,7 @@
 #![allow(dead_code)]
 #![allow(unused)]
 
+mod assets;
 mod board;
 mod constants;
 mod draw;
@@ -40,29 +41,12 @@ impl KApp for App {
   fn init(&mut self, ctx: &mut Ctx) {
     let state = &mut self.state;
 
-    // load assets
-    state.assets.tile = Some(kit::load_img(ctx, "assets/images/tile.png"));
-    state.assets.shadow = Some(kit::load_img(ctx, "assets/images/shadow.png"));
-    state.assets.peg_beige = Some(kit::load_img(ctx, "assets/images/peg_beige.png"));
-    state.assets.peg_blue = Some(kit::load_img(ctx, "assets/images/peg_blue.png"));
-    state.assets.peg_green = Some(kit::load_img(ctx, "assets/images/peg_green.png"));
-    state.assets.peg_pink = Some(kit::load_img(ctx, "assets/images/peg_pink.png"));
-    state.assets.peg_yellow = Some(kit::load_img(ctx, "assets/images/peg_yellow.png"));
-
+    assets::init(ctx, state);
     sprites::init(ctx, state);
 
     // set initial pegs on board
-    let mut peg_i = 0;
-    for pos in board_iterator() {
-      if pos.x == 1 && pos.y == 2 {
-        continue;
-      }
-      let peg_type: PegType = rand::random();
-      state.pegs.peg_type[peg_i] = peg_type;
-      state.pegs.z[peg_i] = rand::random::<f32>() * DROP_HEIGHT_VARIANCE + DROP_HEIGHT_MIN;
-      state.board.set(pos, Some(peg_i));
-      peg_i += 1;
-    }
+    let empty = Coords { x: 1, y: 2 };
+    populate(state, empty);
   }
 
   fn frame(&mut self, ctx: &mut Ctx) {
@@ -89,6 +73,21 @@ fn main() {
     window_title: TITLE.to_string(),
     ..Default::default()
   });
+}
+
+/// fills the game board with pegs; only call when the board is empty!
+fn populate(state: &mut State, empty: Coords) {
+  let mut peg_i = 0;
+  for pos in board_iterator() {
+    if pos.x == 1 && pos.y == 2 {
+      continue;
+    }
+    let peg_type: PegType = rand::random();
+    state.pegs.peg_type[peg_i] = peg_type;
+    state.pegs.z[peg_i] = rand::random::<f32>() * DROP_HEIGHT_VARIANCE + DROP_HEIGHT_MIN;
+    state.board.set(pos, Some(peg_i));
+    peg_i += 1;
+  }
 }
 
 /// calculates the mouse's position in world in order to
