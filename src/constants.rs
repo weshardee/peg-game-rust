@@ -35,3 +35,6 @@ pub const DROP_BOUNCE_DAMPENING: f32 = 0.3;
 pub const DROP_HEIGHT_MIN: f32 = 300.0;
 pub const DROP_HEIGHT_VARIANCE: f32 = 400.0;
 pub const DROP_TERMINAL_VEL: f32 = 20.0;
+
+pub const PEG_EXCITED_HOP_POWER: f32 = 2.0;
+pub const PEG_HOP_POWER: f32 = 10.0;
