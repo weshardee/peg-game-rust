@@ -61,8 +61,6 @@ impl KApp for App {
     process_phase(ctx, state);
 
     // TODO animate peg hover state
-    // TODO animate peg selected state
-    // TODO animate peg buzz state
 
     draw::draw(ctx, state);
   }
@@ -143,7 +141,6 @@ fn process_phase_picking(ctx: &Ctx, state: &mut State) {
           state.pegs.state[peg_i] = PegState::Buzz;
           state.pegs.animation[peg_i] = 0;
           // TODO audio
-          // TODO buzz animation
         }
       }
     }
