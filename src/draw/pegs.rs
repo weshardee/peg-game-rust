@@ -1,6 +1,7 @@
 use crate::board::board_iterator;
 use crate::constants::*;
 use crate::types::*;
+use crate::utils::grounded;
 use kit::*;
 
 const LEAN_THRESHOLD: f32 = 0.5;
@@ -14,53 +15,58 @@ pub fn draw(ctx: &mut Ctx, state: &State) {
   // TODO excited animation (indicates a peg is selected)
 
   for pos in board_iterator() {
-    let peg_i = state.board.get(pos);
-    match peg_i {
+    let i = state.board.get(pos);
+    match i {
       None => {}
-      Some(peg_i) => {
+      Some(i) => {
         let pos = crate::utils::board_to_screen_position(pos);
-        let peg_type = state.pegs.peg_type[peg_i];
-        let peg_state = state.pegs.state[peg_i];
-        let peg_animation_frame = state.pegs.animation[peg_i];
-        let peg_z = state.pegs.z[peg_i];
-        let peg_z_vel = state.pegs.z_vel[peg_i];
-        let shadow_img_id = state.assets.shadow.unwrap().id;
-        let shadow_scale = 1.0 - clampf(peg_z / PEG_SHADOW_FADE_DIST, 0.0, 1.0);
-        let shadow_pivot = Pivot::Center;
-        kit::draw_image(ctx, shadow_img_id, pos, shadow_scale, shadow_pivot);
-
-        let sheet = match peg_type {
-          PegType::Beige => &state.sprites.peg_beige,
-          PegType::Blue => &state.sprites.peg_blue,
-          PegType::Green => &state.sprites.peg_green,
-          PegType::Pink => &state.sprites.peg_pink,
-          PegType::Yellow => &state.sprites.peg_yellow,
-        };
-        let lean = match peg_state {
-          PegState::Buzz => {
-            (peg_animation_frame as f32 / BUZZ_STATE_DURATION as f32 * TAU * 2.0).sin()
-          }
-          _ => 0.0,
-        };
-        let sprite = sprite(sheet, lean, peg_z, peg_z_vel);
-        let sprite = lean_sprite(sprite, lean);
-        let pos = vec2(pos.x(), pos.y() + peg_z);
-        kit::draw_sprite(ctx, sprite, pos, 1.0);
+        draw_shadow(ctx, state, i, pos);
+        draw_sprite(ctx, state, i, pos);
       }
     }
   }
 }
 
-fn sprite(sheet: &PegSheet, lean: f32, z: f32, z_vel: f32) -> Sprite {
+fn draw_shadow(ctx: &mut Ctx, state: &State, i: usize, pos: Vec2) {
+  let peg_type = state.pegs.peg_type[i];
+  let peg_state = state.pegs.state[i];
+  let peg_animation_frame = state.pegs.animation[i];
+  let peg_z = state.pegs.z[i];
+  let peg_z_vel = state.pegs.z_vel[i];
+  let lean = state.pegs.lean[i];
+
+  let shadow_img_id = state.assets.shadow.unwrap().id;
+  let shadow_scale = 1.0 - clampf(peg_z / PEG_SHADOW_FADE_DIST, 0.0, 1.0);
+  let shadow_pivot = Pivot::Center;
+  kit::draw_image(ctx, shadow_img_id, pos, shadow_scale, shadow_pivot);
+}
+
+fn draw_sprite(ctx: &mut Ctx, state: &State, i: usize, pos: Vec2) {
+  let peg_type = state.pegs.peg_type[i];
+  let peg_state = state.pegs.state[i];
+  let z = state.pegs.z[i];
+  let lean = state.pegs.lean[i];
+
+  let sheet = match peg_type {
+    PegType::Beige => &state.sprites.peg_beige,
+    PegType::Blue => &state.sprites.peg_blue,
+    PegType::Green => &state.sprites.peg_green,
+    PegType::Pink => &state.sprites.peg_pink,
+    PegType::Yellow => &state.sprites.peg_yellow,
+  };
+
   let z_abs = z.abs(); // distance from ground
-  let grounded = near_zero(z) && near_zero(z_vel);
-  if !grounded {
+  let grounded = grounded(state, i);
+  let sprite = if !grounded {
     sheet.jump
   } else if lean.abs() > LEAN_THRESHOLD {
     sheet.lean
   } else {
     sheet.front
-  }
+  };
+  let sprite = lean_sprite(sprite, lean);
+  let pos = vec2(pos.x(), pos.y() + z);
+  kit::draw_sprite(ctx, sprite, pos, 1.0);
 }
 
 fn lean_sprite(sprite: Sprite, lean: f32) -> Sprite {

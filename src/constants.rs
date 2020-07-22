@@ -36,5 +36,7 @@ pub const DROP_HEIGHT_MIN: f32 = 300.0;
 pub const DROP_HEIGHT_VARIANCE: f32 = 400.0;
 pub const DROP_TERMINAL_VEL: f32 = 20.0;
 
-pub const PEG_EXCITED_HOP_POWER: f32 = 2.0;
-pub const PEG_HOP_POWER: f32 = 10.0;
+pub const EXCITED_HOP_POWER: f32 = 5.0;
+pub const EXCITED_HOP_INTERVAL: u32 = 40;
+
+pub const JUMP_POWER: f32 = 10.0;

@@ -77,7 +77,7 @@ impl Add for Coords {
   type Output = Self;
   fn add(self, r: Coords) -> Self {
     Coords {
-      x: self.x + r.y,
+      x: self.x + r.x,
       y: self.y + r.y,
     }
   }
@@ -132,6 +132,7 @@ pub struct Pegs {
   pub animation: [u32; MAX_PEGS],
   pub z: [f32; MAX_PEGS],
   pub z_vel: [f32; MAX_PEGS],
+  pub lean: [f32; MAX_PEGS],
 }
 
 impl Default for Pegs {
@@ -142,6 +143,7 @@ impl Default for Pegs {
       animation: [0; MAX_PEGS],
       z: [0.0; MAX_PEGS],
       z_vel: [0.0; MAX_PEGS],
+      lean: [0.0; MAX_PEGS],
     }
   }
 }

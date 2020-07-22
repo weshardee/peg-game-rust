@@ -1,7 +1,6 @@
 use crate::board::Board;
 use crate::constants::*;
-use crate::types::Coords;
-use crate::types::PegType;
+use crate::types::*;
 use kit::window_height;
 use kit::window_width;
 use kit::*;
@@ -15,21 +14,26 @@ pub fn middle_position(a: Coords, b: Coords) -> Coords {
   };
 }
 
-pub fn is_valid_move(board: &Board, from: Coords, to: Coords) -> bool {
-  if to.x > to.y || to.y >= BOARD_SIZE || to.y < 0 || to.x < 0 {
+pub fn invalid(pos: Coords) -> bool {
+  pos.x > pos.y || pos.y >= BOARD_SIZE || pos.y < 0 || pos.x < 0
+}
+
+pub fn is_valid_move(board: &Board, from: Coords, dir: Coords) -> bool {
+  let over = from + dir;
+  let to = over + dir;
+  if invalid(from) || invalid(to) {
     return false;
   }
-  let middle = middle_position(from, to);
-  return board.get(middle).is_some() && board.get(to).is_none();
+  return board.get(over).is_some() && board.get(to).is_none();
 }
 
 const MOVE_DIRECTIONS: [Coords; 6] = [
-  Coords { x: 0, y: 2 },
-  Coords { x: 0, y: -2 },
-  Coords { x: -2, y: -2 },
-  Coords { x: -2, y: 0 },
-  Coords { x: 2, y: 2 },
-  Coords { x: 2, y: 0 },
+  Coords { x: 0, y: 1 },
+  Coords { x: 0, y: -1 },
+  Coords { x: -1, y: -1 },
+  Coords { x: -1, y: 0 },
+  Coords { x: 1, y: 1 },
+  Coords { x: 1, y: 0 },
 ];
 
 pub fn has_valid_moves(board: &Board, from: Coords) -> bool {
@@ -37,9 +41,9 @@ pub fn has_valid_moves(board: &Board, from: Coords) -> bool {
   if board.get(from).is_none() {
     false
   } else {
-    for i in 0..6 {
-      let to = MOVE_DIRECTIONS[i] + from;
-      if is_valid_move(board, from, to) {
+    for i in 0..MOVE_DIRECTIONS.len() {
+      let dir = MOVE_DIRECTIONS[i];
+      if is_valid_move(board, from, dir) {
         return true;
       }
     }
@@ -137,4 +141,10 @@ pub fn window_to_world(ctx: &Ctx, p: Vec2) -> Vec2 {
   // let world_pos = vec2(world_pos.x(), world_pos.y());
 
   world_pos
+}
+
+pub fn grounded(state: &State, peg_i: usize) -> bool {
+  let z = state.pegs.z[peg_i];
+  let z_vel = state.pegs.z_vel[peg_i];
+  near_zero(z) && near_zero(z_vel)
 }

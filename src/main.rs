@@ -59,6 +59,7 @@ impl KApp for App {
     process_phase(ctx, state);
 
     // TODO animate peg hover state
+    // TODO highlight valid moves
 
     // TODO pegs kinda blend together when overlapping; differentiate somehow
     draw::draw(ctx, state);
@@ -133,18 +134,9 @@ fn process_phase_picking(ctx: &Ctx, state: &mut State) {
         let peg_i = state.board.get(pos).unwrap(); // picked position must have a peg!
         let valid = has_valid_moves(&state.board, pos);
         if valid {
-          state.phase = Phase::Excited(pos);
-          state.pegs.state[peg_i] = PegState::Excited;
-          state.pegs.animation[peg_i] = 0;
+          peg_excited(state, peg_i, pos);
         } else {
-          match state.pegs.state[peg_i] {
-            PegState::Buzz => {}
-            _ => {
-              state.pegs.state[peg_i] = PegState::Buzz;
-              state.pegs.animation[peg_i] = 0;
-              // TODO audio
-            }
-          }
+          peg_buzz(state, peg_i);
         }
       }
     }
@@ -175,20 +167,73 @@ fn process_peg_z(ctx: &Ctx, state: &mut State) {
 
 fn process_peg_animations(ctx: &Ctx, state: &mut State) {
   for i in 0..MAX_PEGS {
-    state.pegs.animation[i] += 1;
+    let peg_state = state.pegs.state[i];
+    let animation = state.pegs.animation[i];
+
+    match peg_state {
+      PegState::Buzz => {
+        // exit or advance animation
+        if (animation >= BUZZ_STATE_DURATION) {
+          peg_front(state, i);
+        } else {
+          state.pegs.lean[i] = (animation as f32 / BUZZ_STATE_DURATION as f32 * TAU * 2.0).sin();
+          state.pegs.animation[i] += 1;
+        }
+      }
+      PegState::Excited => {
+        if animation == 0 {
+          // hop right
+          state.pegs.lean[i] = 1.0;
+          state.pegs.z_vel[i] = EXCITED_HOP_POWER;
+        } else if animation == EXCITED_HOP_INTERVAL {
+          // hop left
+          state.pegs.lean[i] = -1.0;
+          state.pegs.z_vel[i] = EXCITED_HOP_POWER;
+        } else if grounded(state, i) {
+          state.pegs.lean[i] = 0.0;
+        }
+        // reset or advance animation
+        if animation >= 2 * EXCITED_HOP_INTERVAL {
+          state.pegs.animation[i] = 0;
+        } else {
+          state.pegs.animation[i] += 1;
+        }
+      }
+      _ => {}
+    }
   }
 
+  // TODO maybe split this up into multiple chunks
   for i in 0..MAX_PEGS {
     let animation = state.pegs.animation[i];
     let peg_state = state.pegs.state[i];
     match (peg_state) {
-      (PegState::Buzz) => {
-        if (animation > BUZZ_STATE_DURATION) {
-          state.pegs.state[i] = PegState::Front;
-          state.pegs.animation[i] = 0;
-        }
-      }
       _ => {}
+    }
+  }
+}
+
+fn peg_front(state: &mut State, i: usize) {
+  state.pegs.state[i] = PegState::Front;
+  state.pegs.animation[i] = 0;
+  state.pegs.lean[i] = 0.0;
+}
+
+fn peg_excited(state: &mut State, i: usize, pos: Coords) {
+  state.phase = Phase::Excited(pos);
+  state.pegs.state[i] = PegState::Excited;
+  state.pegs.animation[i] = 0;
+  state.pegs.lean[i] = 1.0;
+}
+
+fn peg_buzz(state: &mut State, i: usize) {
+  match state.pegs.state[i] {
+    PegState::Buzz => {}
+    _ => {
+      state.pegs.state[i] = PegState::Buzz;
+      state.pegs.animation[i] = 0;
+      state.pegs.lean[i] = 0.0;
+      // TODO audio
     }
   }
 }
