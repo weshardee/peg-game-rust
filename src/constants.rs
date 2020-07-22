@@ -33,6 +33,6 @@ pub const DROP_HEIGHT_VARIANCE: f32 = 400.0;
 pub const DROP_TERMINAL_VEL: f32 = 20.0;
 
 pub const EXCITED_HOP_POWER: f32 = 5.0;
-pub const EXCITED_HOP_INTERVAL: u32 = 40;
+pub const EXCITED_HOP_INTERVAL: u32 = 30;
 
 pub const JUMP_POWER: f32 = 10.0;
