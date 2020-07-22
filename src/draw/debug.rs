@@ -1,11 +1,12 @@
 use crate::board::board_iterator;
 use crate::types::*;
-use crate::utils::peg_bounds;
+use crate::utils::*;
 use kit::*;
 
 pub fn draw(ctx: &mut Ctx, state: &State) {
   draw_debug_mouse_pos(ctx, state);
   draw_debug_peg_hit_areas(ctx, state);
+  draw_debug_tile_hit_areas(ctx, state);
 }
 
 /// draws a circle around the mouse position in world space
@@ -40,10 +41,26 @@ fn draw_debug_peg_hit_areas(ctx: &mut Ctx, state: &State) {
   }
 }
 
+/// draws hit bounderies for tiles and highlights the "hovered"
+/// peg boundary.
+fn draw_debug_tile_hit_areas(ctx: &mut Ctx, state: &State) {
+  for pos in state.board.iterator() {
+    let peg_i = state.board.get(pos);
+    let color = white();
+    draw_tile_bounds(ctx, pos, color);
+  }
+}
+
 pub fn draw_peg_bounds(ctx: &mut Ctx, pos: Coords, peg_type: PegType, color: Vec4) {
   // TODO maybe store bounds on state to avoid recalc
   let (head, body, feet) = peg_bounds(ctx, pos, peg_type);
   draw_circ(ctx, head, color);
   draw_circ(ctx, feet, color);
   draw_rect(ctx, body, color);
+}
+
+pub fn draw_tile_bounds(ctx: &mut Ctx, pos: Coords, color: Vec4) {
+  // TODO maybe store bounds on state to avoid recalc
+  let c = tile_bounds(ctx, pos);
+  draw_circ(ctx, c, color);
 }

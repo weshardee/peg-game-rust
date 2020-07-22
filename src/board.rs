@@ -74,6 +74,10 @@ impl Board {
     self.e[i]
   }
 
+  pub fn count(&self) -> usize {
+    self.count
+  }
+
   pub fn iterator(&self) -> BoardIterator {
     Default::default()
   }

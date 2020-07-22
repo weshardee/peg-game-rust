@@ -110,6 +110,13 @@ pub fn peg_bounds(ctx: &Ctx, pos: Coords, peg_type: PegType) -> (Circle, Rect, C
   (head, body, feet)
 }
 
+pub fn tile_bounds(ctx: &Ctx, pos: Coords) -> Circle {
+  Circle {
+    r: 40.0,
+    center: board_to_screen_position(pos),
+  }
+}
+
 pub fn window_center_px(ctx: &Ctx) -> Vec2 {
   vec2(window_width(ctx) as f32, window_height(ctx) as f32) / 2.0
 }
@@ -184,6 +191,30 @@ pub fn peg_buzz(state: &mut State, i: usize) {
       state.pegs.animation[i] = 0;
       state.pegs.lean[i] = 0.0;
       // TODO audio
+    }
+  }
+}
+
+pub fn game_over_message(state: State) -> &'static str {
+  match state.board.count() {
+    0 => "You're a Genius",
+    1 => "You're Pretty Smart",
+    2 => "Just Plain Dumb",
+    3 => "Just Plain Eg-no-ra-moose",
+    _ => "",
+  }
+}
+
+pub fn is_game_over(state: &State) -> bool {
+  match state.phase {
+    Phase::Ready => false,
+    _ => {
+      for pos in state.board.iterator() {
+        if has_valid_moves(&state.board, pos) {
+          return false;
+        }
+      }
+      true
     }
   }
 }
