@@ -3,7 +3,6 @@ use crate::constants::*;
 use crate::types::Coords;
 use crate::types::State;
 use crate::utils::board_to_screen_position;
-use kit::Rect;
 use kit::*;
 
 const TILE_WIDTH: u32 = 92 * 2;

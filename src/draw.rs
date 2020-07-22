@@ -9,7 +9,7 @@ use crate::types::State;
 use kit::*;
 
 pub fn draw(ctx: &mut Ctx, state: &State) {
-  kit::default_projection_2d(ctx);
+  default_projection_2d(ctx);
   tiles::draw(ctx, state);
   pegs::draw(ctx, state);
   gui::draw(ctx, state);

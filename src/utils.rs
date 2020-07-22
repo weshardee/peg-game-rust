@@ -1,8 +1,6 @@
 use crate::board::Board;
 use crate::constants::*;
 use crate::types::*;
-use kit::window_height;
-use kit::window_width;
 use kit::*;
 
 pub fn middle_position(a: Coords, b: Coords) -> Coords {
@@ -147,4 +145,44 @@ pub fn grounded(state: &State, peg_i: usize) -> bool {
   let z = state.pegs.z[peg_i];
   let z_vel = state.pegs.z_vel[peg_i];
   near_zero(z) && near_zero(z_vel)
+}
+
+/// fills the game board with pegs; only call when the board is empty!
+pub fn populate(state: &mut State, empty: Coords) {
+  let mut peg_i = 0;
+  for pos in state.board.iterator() {
+    if pos.x == 1 && pos.y == 2 {
+      continue;
+    }
+    let peg_type: PegType = rand::random();
+    state.pegs.peg_type[peg_i] = peg_type;
+    state.pegs.z[peg_i] = rand::random::<f32>() * DROP_HEIGHT_VARIANCE + DROP_HEIGHT_MIN;
+    state.board.set(pos, Some(peg_i));
+    peg_i += 1;
+  }
+}
+
+pub fn peg_front(state: &mut State, i: usize) {
+  state.pegs.state[i] = PegState::Front;
+  state.pegs.animation[i] = 0;
+  state.pegs.lean[i] = 0.0;
+}
+
+pub fn peg_excited(state: &mut State, i: usize, pos: Coords) {
+  state.phase = Phase::Excited(pos);
+  state.pegs.state[i] = PegState::Excited;
+  state.pegs.animation[i] = 0;
+  state.pegs.lean[i] = 1.0;
+}
+
+pub fn peg_buzz(state: &mut State, i: usize) {
+  match state.pegs.state[i] {
+    PegState::Buzz => {}
+    _ => {
+      state.pegs.state[i] = PegState::Buzz;
+      state.pegs.animation[i] = 0;
+      state.pegs.lean[i] = 0.0;
+      // TODO audio
+    }
+  }
 }

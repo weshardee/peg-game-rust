@@ -15,7 +15,7 @@ pub fn draw(ctx: &mut Ctx, state: &State) {
 /// TODO mouse pos seems to noticably lag
 fn draw_debug_mouse_pos(ctx: &mut Ctx, state: &State) {
   let center = state.mouse_pos;
-  kit::draw_circ(ctx, Circle { center, r: 10.0 }, red());
+  draw_circ(ctx, Circle { center, r: 10.0 }, red());
 }
 
 /// draws hit bounderies for pegs and highlights the "hovered"
@@ -43,7 +43,7 @@ fn draw_debug_peg_hit_areas(ctx: &mut Ctx, state: &State) {
 pub fn draw_peg_bounds(ctx: &mut Ctx, pos: Coords, peg_type: PegType, color: Vec4) {
   // TODO maybe store bounds on state to avoid recalc
   let (head, body, feet) = peg_bounds(ctx, pos, peg_type);
-  kit::draw_circ(ctx, head, color);
-  kit::draw_circ(ctx, feet, color);
-  kit::draw_rect(ctx, body, color);
+  draw_circ(ctx, head, color);
+  draw_circ(ctx, feet, color);
+  draw_rect(ctx, body, color);
 }
