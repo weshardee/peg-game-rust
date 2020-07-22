@@ -6,11 +6,11 @@ use kit::*;
 const LEAN_THRESHOLD: f32 = 0.5;
 // const DUCK_THRESHOLD: f32 = 40.0;
 const GROUNDED_THRESHOLD: f32 = 1.0;
+const PEG_SHADOW_FADE_DIST: f32 = 50.0;
 
 pub fn draw(ctx: &mut Ctx, state: &State) {
   // TODO death animation
   // TODO move animation
-  // TODO buzz animation (when an invalid move is chosen)
   // TODO excited animation (indicates a peg is selected)
 
   for pos in board_iterator() {
@@ -19,15 +19,15 @@ pub fn draw(ctx: &mut Ctx, state: &State) {
       None => {}
       Some(peg_i) => {
         let pos = crate::utils::board_to_screen_position(pos);
-        let shadow_img_id = state.assets.shadow.unwrap().id;
-        let scale = 1.0;
-        let pivot = Pivot::Center;
-        kit::draw_image(ctx, shadow_img_id, pos, scale, pivot);
         let peg_type = state.pegs.peg_type[peg_i];
         let peg_state = state.pegs.state[peg_i];
         let peg_animation_frame = state.pegs.animation[peg_i];
         let peg_z = state.pegs.z[peg_i];
         let peg_z_vel = state.pegs.z_vel[peg_i];
+        let shadow_img_id = state.assets.shadow.unwrap().id;
+        let shadow_scale = 1.0 - clampf(peg_z / PEG_SHADOW_FADE_DIST, 0.0, 1.0);
+        let shadow_pivot = Pivot::Center;
+        kit::draw_image(ctx, shadow_img_id, pos, shadow_scale, shadow_pivot);
 
         let sheet = match peg_type {
           PegType::Beige => &state.sprites.peg_beige,
@@ -43,33 +43,31 @@ pub fn draw(ctx: &mut Ctx, state: &State) {
           _ => 0.0,
         };
         let sprite = sprite(sheet, lean, peg_z, peg_z_vel);
+        let sprite = lean_sprite(sprite, lean);
         let pos = vec2(pos.x(), pos.y() + peg_z);
-        kit::draw_sprite(ctx, sprite, pos, scale);
+        kit::draw_sprite(ctx, sprite, pos, 1.0);
       }
     }
   }
 }
 
-// fn buzz_sprite(sheet: PegSheet, frame_count: u32, z: f32) -> Sprite {
-//   let percent = frame_count as f32 / BUZZ_STATE_DURATION as f32;
-//   let value = TAU * percent;
-// };
-
 fn sprite(sheet: &PegSheet, lean: f32, z: f32, z_vel: f32) -> Sprite {
   let z_abs = z.abs(); // distance from ground
   let grounded = near_zero(z) && near_zero(z_vel);
-  if grounded {
-    if lean.abs() > LEAN_THRESHOLD {
-      if lean < 0.0 {
-        return sheet.lean.flip_x();
-      } else {
-        return sheet.lean;
-      }
-    } else {
-      return sheet.front;
-    }
-  } else {
+  if !grounded {
     sheet.jump
+  } else if lean.abs() > LEAN_THRESHOLD {
+    sheet.lean
+  } else {
+    sheet.front
+  }
+}
+
+fn lean_sprite(sprite: Sprite, lean: f32) -> Sprite {
+  if lean < 0.0 {
+    sprite.flip_x()
+  } else {
+    sprite
   }
 }
 
