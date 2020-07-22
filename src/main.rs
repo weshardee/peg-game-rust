@@ -10,10 +10,8 @@ mod types;
 mod utils;
 
 use crate::board::board_iterator;
-use crate::constants::BOARD_SIZE;
-use crate::constants::MAX_PEGS;
+use crate::constants::*;
 use crate::types::*;
-use constants::*;
 use kit::*;
 use rand;
 use std::time::Duration;
@@ -62,6 +60,7 @@ impl KApp for App {
 
     // TODO animate peg hover state
 
+    // TODO pegs kinda blend together when overlapping; differentiate somehow
     draw::draw(ctx, state);
   }
 }
@@ -138,9 +137,14 @@ fn process_phase_picking(ctx: &Ctx, state: &mut State) {
           state.pegs.state[peg_i] = PegState::Excited;
           state.pegs.animation[peg_i] = 0;
         } else {
-          state.pegs.state[peg_i] = PegState::Buzz;
-          state.pegs.animation[peg_i] = 0;
-          // TODO audio
+          match state.pegs.state[peg_i] {
+            PegState::Buzz => {}
+            _ => {
+              state.pegs.state[peg_i] = PegState::Buzz;
+              state.pegs.animation[peg_i] = 0;
+              // TODO audio
+            }
+          }
         }
       }
     }
