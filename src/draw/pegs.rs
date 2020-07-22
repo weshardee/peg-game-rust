@@ -1,8 +1,11 @@
 use crate::board::board_iterator;
+use crate::constants::*;
 use crate::types::*;
-use kit;
-use kit::Ctx;
-use kit::Pivot;
+use kit::*;
+
+const LEAN_THRESHOLD: f32 = 0.5;
+// const DUCK_THRESHOLD: f32 = 40.0;
+const GROUNDED_THRESHOLD: f32 = 1.0;
 
 pub fn draw(ctx: &mut Ctx, state: &State) {
   // TODO death animation
@@ -22,6 +25,10 @@ pub fn draw(ctx: &mut Ctx, state: &State) {
         kit::draw_image(ctx, shadow_img_id, pos, scale, pivot);
         let peg_type = state.pegs.peg_type[peg_i];
         let peg_state = state.pegs.state[peg_i];
+        let peg_animation_frame = state.pegs.animation[peg_i];
+        let peg_z = state.pegs.z[peg_i];
+        let peg_z_vel = state.pegs.z_vel[peg_i];
+
         let sheet = match peg_type {
           PegType::Beige => &state.sprites.peg_beige,
           PegType::Blue => &state.sprites.peg_blue,
@@ -29,15 +36,34 @@ pub fn draw(ctx: &mut Ctx, state: &State) {
           PegType::Pink => &state.sprites.peg_pink,
           PegType::Yellow => &state.sprites.peg_yellow,
         };
-        let sprite = match peg_state {
-          PegState::Front => sheet.front,
-          PegState::Buzz => sheet.hurt,
-          PegState::Excited => sheet.lean,
-          _ => sheet.duck,
+        let lean = match peg_state {
+          PegState::Buzz => (peg_animation_frame as f32 / BUZZ_STATE_DURATION as f32 * TAU).sin(),
+          _ => 0.0,
         };
+        let sprite = sprite(sheet, lean, peg_z, peg_z_vel);
+        let pos = vec2(pos.x(), pos.y() + peg_z);
         kit::draw_sprite(ctx, sprite, pos, scale);
       }
     }
+  }
+}
+
+// fn buzz_sprite(sheet: PegSheet, frame_count: u32, z: f32) -> Sprite {
+//   let percent = frame_count as f32 / BUZZ_STATE_DURATION as f32;
+//   let value = TAU * percent;
+// };
+
+fn sprite(sheet: &PegSheet, lean: f32, z: f32, z_vel: f32) -> Sprite {
+  let z_abs = z.abs(); // distance from ground
+  let grounded = near_zero(z) && near_zero(z_vel);
+  if grounded {
+    if lean.abs() > LEAN_THRESHOLD {
+      return sheet.lean;
+    } else {
+      return sheet.front;
+    }
+  } else {
+    sheet.jump
   }
 }
 

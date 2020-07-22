@@ -23,3 +23,15 @@ pub const RESET_URI: &str = "/assets/images/return.png";
 pub const DEATH_DURATION: u32 = 200;
 pub const DEATH_ALPHA: f32 = 0.0;
 // pub const DEATH_SCALE: Vec2 = vec2(0.0, 0.0);
+
+pub const BUZZ_STATE_DURATION: u32 = 30; // frames
+pub const FALLING_SPRING_DESC: SpringDesc = SpringDesc {
+  stiffness: 100.0,
+  damping: 10.0,
+};
+
+pub const DROP_GRAVITY_PER_DT: f32 = -0.6;
+pub const DROP_BOUNCE_DAMPENING: f32 = 0.5;
+pub const DROP_HEIGHT_MIN: f32 = 300.0;
+pub const DROP_HEIGHT_VARIANCE: f32 = 400.0;
+pub const DROP_TERMINAL_VEL: f32 = 20.0;

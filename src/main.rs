@@ -10,7 +10,9 @@ mod utils;
 
 use crate::board::board_iterator;
 use crate::constants::BOARD_SIZE;
+use crate::constants::MAX_PEGS;
 use crate::types::*;
+use constants::*;
 use kit::*;
 use rand;
 use std::time::Duration;
@@ -57,6 +59,7 @@ impl KApp for App {
       }
       let peg_type: PegType = rand::random();
       state.pegs.peg_type[peg_i] = peg_type;
+      state.pegs.z[peg_i] = rand::random::<f32>() * DROP_HEIGHT_VARIANCE + DROP_HEIGHT_MIN;
       state.board.set(pos, Some(peg_i));
       peg_i += 1;
     }
@@ -69,6 +72,8 @@ impl KApp for App {
 
     process_mouse_pos(ctx, state);
     process_over_peg(ctx, state);
+    process_peg_animations(ctx, state);
+    process_peg_z(ctx, state);
     process_phase(ctx, state);
 
     // TODO animate peg hover state
@@ -134,12 +139,56 @@ fn process_phase_picking(ctx: &Ctx, state: &mut State) {
         if valid {
           state.phase = Phase::Excited(pos);
           state.pegs.state[peg_i] = PegState::Excited;
+          state.pegs.animation[peg_i] = 0;
         } else {
           state.pegs.state[peg_i] = PegState::Buzz;
+          state.pegs.animation[peg_i] = 0;
           // TODO audio
           // TODO buzz animation
         }
       }
+    }
+  }
+}
+
+fn process_peg_z(ctx: &Ctx, state: &mut State) {
+  for i in 0..MAX_PEGS {
+    let z = state.pegs.z[i];
+    let z_vel = state.pegs.z_vel[i];
+    let z_vel = z_vel + DROP_GRAVITY_PER_DT; // add in acceleration
+    let mut z_vel = clampf(z_vel, -DROP_TERMINAL_VEL, DROP_TERMINAL_VEL);
+    let mut z = z + z_vel;
+
+    if z.abs() < 1.0 && z_vel.abs() < 1.0 {
+      // gotta stop sometime
+      z = 0.0;
+      z_vel = 0.0;
+    } else if z < 0.0 {
+      // can't be below ground! flip to bounce
+      z = -z;
+      z_vel = -z_vel * DROP_BOUNCE_DAMPENING; // flip and dampen vel
+    }
+    state.pegs.z[i] = z;
+    state.pegs.z_vel[i] = z_vel;
+  }
+}
+
+fn process_peg_animations(ctx: &Ctx, state: &mut State) {
+  for i in 0..MAX_PEGS {
+    state.pegs.animation[i] += 1;
+  }
+
+  for i in 0..MAX_PEGS {
+    let animation = state.pegs.animation[i];
+    let peg_state = state.pegs.state[i];
+    match (peg_state) {
+      (PegState::Buzz) => {
+        if (animation > BUZZ_STATE_DURATION) {
+          state.pegs.state[i] = PegState::Front;
+          state.pegs.animation[i] = 0;
+        }
+      }
+      _ => {}
     }
   }
 }

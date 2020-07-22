@@ -1,5 +1,5 @@
 use crate::board::Board;
-use crate::constants::MAX_PEGS;
+use crate::constants::*;
 use kit::*;
 use rand::distributions::Distribution;
 use rand::distributions::Standard;
@@ -129,6 +129,9 @@ pub struct Sprites {
 pub struct Pegs {
   pub peg_type: [PegType; MAX_PEGS],
   pub state: [PegState; MAX_PEGS],
+  pub animation: [u32; MAX_PEGS],
+  pub z: [f32; MAX_PEGS],
+  pub z_vel: [f32; MAX_PEGS],
 }
 
 impl Default for Pegs {
@@ -136,6 +139,9 @@ impl Default for Pegs {
     Self {
       peg_type: [PegType::Beige; MAX_PEGS],
       state: [PegState::Front; MAX_PEGS],
+      animation: [0; MAX_PEGS],
+      z: [0.0; MAX_PEGS],
+      z_vel: [0.0; MAX_PEGS],
     }
   }
 }
