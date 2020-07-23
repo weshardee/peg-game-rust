@@ -136,6 +136,9 @@ fn update_peg_animations(ctx: &Ctx, state: &mut State) {
                 if (state.pegs.animation[i] > JUMP_DURATION) {
                     state.pegs.state[i] = PegState::Dead;
                     state.board.set(pos, None);
+                } else {
+                    let progress = state.pegs.animation[i] as f32 / JUMP_DURATION as f32;
+                    state.pegs.lean[i] = (progress * 15.0).sin();
                 }
             }
             _ => {}

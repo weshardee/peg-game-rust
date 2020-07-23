@@ -60,7 +60,10 @@ fn draw_sprite(ctx: &mut Ctx, state: &State, i: usize, pos: Vec2) {
     let sprite = if !grounded {
         sheet.jump
     } else if lean.abs() > LEAN_THRESHOLD {
-        sheet.lean
+        match peg_state {
+            PegState::Dying(..) => sheet.hurt,
+            _ => sheet.lean,
+        }
     } else {
         sheet.front
     };

@@ -218,7 +218,6 @@ pub fn peg_die(state: &mut State, i: usize, pos: Coords) {
 pub fn peg_dead(state: &mut State, i: usize) {
     state.pegs.state[i] = PegState::Dead;
     state.pegs.animation[i] = 0;
-    // TODO remove from the board?
 }
 
 pub fn game_over_message(state: State) -> &'static str {
