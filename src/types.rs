@@ -18,7 +18,7 @@ pub enum PegState {
     Excited,
     Buzz,
     Jump(Coords, Coords),
-    Dying,
+    Dying(Coords),
     Dead,
 }
 

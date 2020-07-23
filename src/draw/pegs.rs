@@ -1,7 +1,6 @@
-use crate::board::board_iterator;
 use crate::constants::*;
 use crate::types::*;
-use crate::utils::grounded;
+use crate::utils::*;
 use kit::*;
 
 const LEAN_THRESHOLD: f32 = 0.5;
@@ -14,12 +13,12 @@ pub fn draw(ctx: &mut Ctx, state: &State) {
     // TODO move animation
     // TODO excited animation (indicates a peg is selected)
 
-    for pos in board_iterator() {
+    for pos in state.board.iterator() {
         let i = state.board.get(pos);
         match i {
             None => {}
             Some(i) => {
-                let pos = crate::utils::board_to_screen_position(pos);
+                let pos = board_to_screen_position(pos);
                 draw_shadow(ctx, state, i, pos);
                 draw_sprite(ctx, state, i, pos);
             }
@@ -46,6 +45,7 @@ fn draw_sprite(ctx: &mut Ctx, state: &State, i: usize, pos: Vec2) {
     let peg_state = state.pegs.state[i];
     let z = state.pegs.z[i];
     let lean = state.pegs.lean[i];
+    let anim = state.pegs.animation[i];
 
     let sheet = match peg_type {
         PegType::Beige => &state.sprites.peg_beige,
@@ -65,6 +65,18 @@ fn draw_sprite(ctx: &mut Ctx, state: &State, i: usize, pos: Vec2) {
         sheet.front
     };
     let sprite = lean_sprite(sprite, lean);
+    let pos = match peg_state {
+        PegState::Jump(from_pos, to_pos) => {
+            // interpolate from and to positions based on animation duration
+            let percent = anim as f32 / JUMP_DURATION as f32;
+            // TODO would this be simpler if I just gave every peg a world position and
+            // tweened them every frame toward their current assigned board position?
+            let from_pos = board_to_screen_position(from_pos);
+            let to_pos = board_to_screen_position(to_pos);
+            from_pos.lerp(to_pos, percent)
+        }
+        _ => pos,
+    };
     let pos = vec2(pos.x(), pos.y() + z);
     kit::draw_sprite(ctx, sprite, pos, 1.0);
 }

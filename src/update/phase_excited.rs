@@ -22,7 +22,7 @@ pub fn update(ctx: &Ctx, state: &mut State, from_pos: Coords) {
                         let from_i = state.board.get(from_pos).unwrap();
                         let over_i = state.board.get(over_pos).unwrap();
                         peg_jump(state, from_i, from_pos, to_pos);
-                        peg_die(state, over_i);
+                        peg_die(state, over_i, over_pos);
                         // note we'll actually change the board contents in the jump phase,
                         // because we need to let the animations run their course before we
                         // remove stuff from the board

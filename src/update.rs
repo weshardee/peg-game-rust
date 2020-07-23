@@ -55,23 +55,33 @@ fn update_phase(ctx: &Ctx, state: &mut State) {
 
 fn update_peg_z(ctx: &Ctx, state: &mut State) {
     for i in 0..MAX_PEGS {
-        let z = state.pegs.z[i];
-        let z_vel = state.pegs.z_vel[i];
-        let z_vel = z_vel + DROP_GRAVITY_PER_DT; // add in acceleration
-        let mut z_vel = clampf(z_vel, -DROP_TERMINAL_VEL, DROP_TERMINAL_VEL);
-        let mut z = z + z_vel;
+        let peg_state = state.pegs.state[i];
+        match peg_state {
+            PegState::Jump(..) => {
+                let percent = state.pegs.animation[i] as f32 / JUMP_DURATION as f32;
+                state.pegs.z[i] = (percent * PI).sin() * JUMP_HEIGHT;
+            }
+            _ => {
+                // TODO replace with easing?
+                let z = state.pegs.z[i];
+                let z_vel = state.pegs.z_vel[i];
+                let z_vel = z_vel + DROP_GRAVITY_PER_DT; // add in acceleration
+                let mut z_vel = clampf(z_vel, -DROP_TERMINAL_VEL, DROP_TERMINAL_VEL);
+                let mut z = z + z_vel;
 
-        if z.abs() < 1.0 && z_vel.abs() < 1.0 {
-            // gotta stop sometime
-            z = 0.0;
-            z_vel = 0.0;
-        } else if z < 0.0 {
-            // can't be below ground! flip to bounce
-            z = -z;
-            z_vel = -z_vel * DROP_BOUNCE_DAMPENING; // flip and dampen vel
+                if z.abs() < 1.0 && z_vel.abs() < 1.0 {
+                    // gotta stop sometime
+                    z = 0.0;
+                    z_vel = 0.0;
+                } else if z < 0.0 {
+                    // can't be below ground! flip to bounce
+                    z = -z;
+                    z_vel = -z_vel * DROP_BOUNCE_DAMPENING; // flip and dampen vel
+                }
+                state.pegs.z[i] = z;
+                state.pegs.z_vel[i] = z_vel;
+            }
         }
-        state.pegs.z[i] = z;
-        state.pegs.z_vel[i] = z_vel;
     }
 }
 
@@ -84,7 +94,7 @@ fn update_peg_animations(ctx: &Ctx, state: &mut State) {
             PegState::Buzz => {
                 // exit or advance animation
                 if (animation >= BUZZ_STATE_DURATION) {
-                    peg_front(state, i);
+                    peg_idle(state, i);
                 } else {
                     state.pegs.lean[i] =
                         (animation as f32 / BUZZ_STATE_DURATION as f32 * TAU * 2.0).sin();
@@ -108,6 +118,24 @@ fn update_peg_animations(ctx: &Ctx, state: &mut State) {
                     state.pegs.animation[i] = 0;
                 } else {
                     state.pegs.animation[i] += 1;
+                }
+            }
+            PegState::Jump(from, to) => {
+                state.pegs.animation[i] += 1;
+                state.pegs.lean[i] = (to.x - from.x) as f32;
+                if (state.pegs.animation[i] == JUMP_DURATION / 2) {
+                    // swap in the middle of the jump so we can use board order layering
+                    state.board.set(from, None);
+                    state.board.set(to, Some(i));
+                } else if (state.pegs.animation[i] > JUMP_DURATION) {
+                    peg_idle(state, i);
+                }
+            }
+            PegState::Dying(pos) => {
+                state.pegs.animation[i] += 1;
+                if (state.pegs.animation[i] > JUMP_DURATION) {
+                    state.pegs.state[i] = PegState::Dead;
+                    state.board.set(pos, None);
                 }
             }
             _ => {}

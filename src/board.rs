@@ -6,108 +6,104 @@ use crate::types::PegType;
 type Slot = Option<usize>;
 
 fn board_i(pos: Coords) -> usize {
-  let x = pos.x;
-  let y = pos.y;
-  match (x, y) {
-    (0, 0) => 0,
-    (0, 1) => 1,
-    (1, 1) => 2,
-    (0, 2) => 3,
-    (1, 2) => 4,
-    (2, 2) => 5,
-    (0, 3) => 6,
-    (1, 3) => 7,
-    (2, 3) => 8,
-    (3, 3) => 9,
-    (0, 4) => 10,
-    (1, 4) => 11,
-    (2, 4) => 12,
-    (3, 4) => 13,
-    (4, 4) => 14,
-    (x, y) => panic!("not a valid board position ({}, {})", x, y),
-  }
+    let x = pos.x;
+    let y = pos.y;
+    match (x, y) {
+        (0, 0) => 0,
+        (0, 1) => 1,
+        (1, 1) => 2,
+        (0, 2) => 3,
+        (1, 2) => 4,
+        (2, 2) => 5,
+        (0, 3) => 6,
+        (1, 3) => 7,
+        (2, 3) => 8,
+        (3, 3) => 9,
+        (0, 4) => 10,
+        (1, 4) => 11,
+        (2, 4) => 12,
+        (3, 4) => 13,
+        (4, 4) => 14,
+        (x, y) => panic!("not a valid board position ({}, {})", x, y),
+    }
 }
 
 /// Represents a triangular game board. The first row is a single space in length
 /// and each subsequen row is one unit longer until the final row which will
 /// have a number of spaces equal to the `size` of the board.
 pub struct Board {
-  e: [Slot; BOARD_NUM_SPACES],
-  count: usize,
+    e: [Slot; BOARD_NUM_SPACES],
+    count: usize,
 }
 
 impl Default for Board {
-  fn default() -> Self {
-    Self {
-      e: [None; BOARD_NUM_SPACES],
-      count: 0,
+    fn default() -> Self {
+        Self {
+            e: [None; BOARD_NUM_SPACES],
+            count: 0,
+        }
     }
-  }
 }
 
 impl Board {
-  pub fn wipe(&mut self) {
-    for i in 0..BOARD_NUM_SPACES {
-      self.e[i] = None;
-    }
-    self.count = 0;
-  }
-
-  pub fn set(&mut self, pos: Coords, item: Slot) {
-    let i = board_i(pos);
-
-    match (self.e[i], item) {
-      (None, Some(_)) => {
-        self.count += 1;
-      }
-      (Some(_), None) => {
-        self.count -= 1;
-      }
-      _ => {}
+    pub fn wipe(&mut self) {
+        for i in 0..BOARD_NUM_SPACES {
+            self.e[i] = None;
+        }
+        self.count = 0;
     }
 
-    self.e[i] = item;
-  }
+    pub fn set(&mut self, pos: Coords, item: Slot) {
+        let i = board_i(pos);
 
-  pub fn get(&self, pos: Coords) -> Option<usize> {
-    let i = board_i(pos);
-    self.e[i]
-  }
+        match (self.e[i], item) {
+            (None, Some(_)) => {
+                self.count += 1;
+            }
+            (Some(_), None) => {
+                self.count -= 1;
+            }
+            _ => {}
+        }
 
-  pub fn count(&self) -> usize {
-    self.count
-  }
+        self.e[i] = item;
+    }
 
-  pub fn iterator(&self) -> BoardIterator {
-    Default::default()
-  }
-}
+    pub fn get(&self, pos: Coords) -> Option<usize> {
+        let i = board_i(pos);
+        self.e[i]
+    }
 
-pub fn board_iterator() -> BoardIterator {
-  Default::default()
+    pub fn count(&self) -> usize {
+        self.count
+    }
+
+    pub fn iterator(&self) -> BoardIterator {
+        Default::default()
+    }
 }
 
 #[derive(Default)]
 pub struct BoardIterator {
-  _pos: Coords,
+    _pos: Coords,
 }
 
 impl Iterator for BoardIterator {
-  type Item = Coords;
+    type Item = Coords;
 
-  fn next(&mut self) -> std::option::Option<<Self as std::iter::Iterator>::Item> {
-    let pos = self._pos;
-    if pos.y >= BOARD_SIZE {
-      None
-    } else if pos.x == pos.y {
-      self._pos.x = 0;
-      self._pos.y += 1;
-      Some(pos)
-    } else {
-      self._pos.x += 1;
-      Some(pos)
+    fn next(&mut self) -> std::option::Option<<Self as std::iter::Iterator>::Item> {
+        let pos = self._pos;
+        if pos.y >= BOARD_SIZE {
+            None
+        } else if pos.x == pos.y {
+            self._pos.x = 0;
+            self._pos.y += 1;
+            Some(pos)
+        } else {
+            self._pos.x += 1;
+            Some(pos)
+        }
     }
-  }
 }
 
 // forEach(cb: (coords: BoardCoords, value: ?T) => void) -> void {

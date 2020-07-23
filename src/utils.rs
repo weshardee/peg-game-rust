@@ -179,7 +179,7 @@ pub fn populate(state: &mut State, empty: Coords) {
     }
 }
 
-pub fn peg_front(state: &mut State, i: usize) {
+pub fn peg_idle(state: &mut State, i: usize) {
     state.pegs.state[i] = PegState::Idle;
     state.pegs.animation[i] = 0;
     state.pegs.lean[i] = 0.0;
@@ -205,17 +205,19 @@ pub fn peg_buzz(state: &mut State, i: usize) {
 }
 
 pub fn peg_jump(state: &mut State, i: usize, from: Coords, to: Coords) {
+    // TODO maybe embed the animation counter into the state enum?
     state.pegs.state[i] = PegState::Jump(from, to);
-    state.pegs.z_vel[i] = JUMP_POWER;
+    state.pegs.animation[i] = 0;
 }
 
-pub fn peg_die(state: &mut State, i: usize) {
-    state.pegs.state[i] = PegState::Dying;
+pub fn peg_die(state: &mut State, i: usize, pos: Coords) {
+    state.pegs.state[i] = PegState::Dying(pos);
     state.pegs.animation[i] = 0;
 }
 
 pub fn peg_dead(state: &mut State, i: usize) {
     state.pegs.state[i] = PegState::Dead;
+    state.pegs.animation[i] = 0;
     // TODO remove from the board?
 }
 
