@@ -8,3 +8,6 @@ version = "0.1.0"
 kit = {version = "*", path = "../kit"}
 rand = "0.7"
 shortid = "1.0"
+
+[profile.dev]
+lto = "off"
