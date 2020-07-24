@@ -9,87 +9,87 @@ const GROUNDED_THRESHOLD: f32 = 1.0;
 const PEG_SHADOW_FADE_DIST: f32 = 50.0;
 
 pub fn draw(ctx: &mut Ctx, state: &State) {
-    // TODO death animation
-    // TODO move animation
-    // TODO excited animation (indicates a peg is selected)
+  // TODO death animation
+  // TODO move animation
+  // TODO excited animation (indicates a peg is selected)
 
-    for pos in state.board.iterator() {
-        let i = state.board.get(pos);
-        match i {
-            None => {}
-            Some(i) => {
-                let pos = board_to_screen_position(pos);
-                draw_shadow(ctx, state, i, pos);
-                draw_sprite(ctx, state, i, pos);
-            }
-        }
+  for pos in state.board.iterator() {
+    let i = state.board.get(pos);
+    match i {
+      None => {}
+      Some(i) => {
+        let pos = board_to_screen_position(pos);
+        draw_shadow(ctx, state, i, pos);
+        draw_sprite(ctx, state, i, pos);
+      }
     }
+  }
 }
 
 fn draw_shadow(ctx: &mut Ctx, state: &State, i: usize, pos: Vec2) {
-    let peg_type = state.pegs.peg_type[i];
-    let peg_state = state.pegs.state[i];
-    let peg_animation_frame = state.pegs.animation[i];
-    let peg_z = state.pegs.z[i];
-    let peg_z_vel = state.pegs.z_vel[i];
-    let lean = state.pegs.lean[i];
+  let peg_type = state.pegs.peg_type[i];
+  let peg_state = state.pegs.state[i];
+  let peg_animation_frame = state.pegs.animation[i];
+  let peg_z = state.pegs.z[i];
+  let peg_z_vel = state.pegs.z_vel[i];
+  let lean = state.pegs.lean[i];
 
-    let shadow_img_id = state.assets.shadow.unwrap().id;
-    let shadow_scale = 1.0 - clampf(peg_z / PEG_SHADOW_FADE_DIST, 0.0, 1.0);
-    let shadow_pivot = Pivot::Center;
-    kit::draw_image(ctx, shadow_img_id, pos, shadow_scale, shadow_pivot);
+  let shadow_img_id = state.assets.shadow.unwrap().id;
+  let shadow_scale = 1.0 - clampf(peg_z / PEG_SHADOW_FADE_DIST, 0.0, 1.0);
+  let shadow_pivot = Pivot::Center;
+  kit::draw_image(ctx, shadow_img_id, pos, shadow_scale, shadow_pivot);
 }
 
 fn draw_sprite(ctx: &mut Ctx, state: &State, i: usize, pos: Vec2) {
-    let peg_type = state.pegs.peg_type[i];
-    let peg_state = state.pegs.state[i];
-    let z = state.pegs.z[i];
-    let lean = state.pegs.lean[i];
-    let anim = state.pegs.animation[i];
+  let peg_type = state.pegs.peg_type[i];
+  let peg_state = state.pegs.state[i];
+  let z = state.pegs.z[i];
+  let lean = state.pegs.lean[i];
+  let anim = state.pegs.animation[i];
 
-    let sheet = match peg_type {
-        PegType::Beige => &state.sprites.peg_beige,
-        PegType::Blue => &state.sprites.peg_blue,
-        PegType::Green => &state.sprites.peg_green,
-        PegType::Pink => &state.sprites.peg_pink,
-        PegType::Yellow => &state.sprites.peg_yellow,
-    };
+  let sheet = match peg_type {
+    PegType::Beige => &state.sprites.peg_beige,
+    PegType::Blue => &state.sprites.peg_blue,
+    PegType::Green => &state.sprites.peg_green,
+    PegType::Pink => &state.sprites.peg_pink,
+    PegType::Yellow => &state.sprites.peg_yellow,
+  };
 
-    let z_abs = z.abs(); // distance from ground
-    let grounded = grounded(state, i);
-    let sprite = if !grounded {
-        sheet.jump
-    } else if lean.abs() > LEAN_THRESHOLD {
-        match peg_state {
-            PegState::Dying(..) => sheet.hurt,
-            _ => sheet.lean,
-        }
-    } else {
-        sheet.front
-    };
-    let sprite = lean_sprite(sprite, lean);
-    let pos = match peg_state {
-        PegState::Jump(from_pos, to_pos) => {
-            // interpolate from and to positions based on animation duration
-            let percent = anim as f32 / JUMP_DURATION as f32;
-            // TODO would this be simpler if I just gave every peg a world position and
-            // tweened them every frame toward their current assigned board position?
-            let from_pos = board_to_screen_position(from_pos);
-            let to_pos = board_to_screen_position(to_pos);
-            from_pos.lerp(to_pos, percent)
-        }
-        _ => pos,
-    };
-    let pos = vec2(pos.x(), pos.y() + z);
-    kit::draw_sprite(ctx, sprite, pos, 1.0);
+  let z_abs = z.abs(); // distance from ground
+  let grounded = grounded(state, i);
+  let sprite = if !grounded {
+    sheet.jump
+  } else if lean.abs() > LEAN_THRESHOLD {
+    match peg_state {
+      PegState::Dying(..) => sheet.hurt,
+      _ => sheet.lean,
+    }
+  } else {
+    sheet.front
+  };
+  let sprite = lean_sprite(sprite, lean);
+  let pos = match peg_state {
+    PegState::Jump(from_pos, to_pos) => {
+      // interpolate from and to positions based on animation duration
+      let percent = anim as f32 / JUMP_DURATION as f32;
+      // TODO would this be simpler if I just gave every peg a world position and
+      // tweened them every frame toward their current assigned board position?
+      let from_pos = board_to_screen_position(from_pos);
+      let to_pos = board_to_screen_position(to_pos);
+      from_pos.lerp(to_pos, percent)
+    }
+    _ => pos,
+  };
+  let pos = vec2(pos.x(), pos.y() + z);
+  kit::draw_sprite(ctx, sprite, pos, 1.0);
 }
 
 fn lean_sprite(sprite: Sprite, lean: f32) -> Sprite {
-    if lean < 0.0 {
-        sprite.flip_x()
-    } else {
-        sprite
-    }
+  if lean < 0.0 {
+    sprite.flip_x()
+  } else {
+    sprite
+  }
 }
 
 // const LEAN_THRESHOLD = 0.5;

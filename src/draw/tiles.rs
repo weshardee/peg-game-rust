@@ -9,18 +9,18 @@ const TILE_HEIGHT: u32 = 126 * 2;
 const SCALE: f32 = BOARD_CELL_WIDTH_PX as f32 / TILE_WIDTH as f32;
 
 fn pivot_px() -> Pivot {
-    Pivot::Px(0.5 * TILE_WIDTH as f32, 0.625 * TILE_HEIGHT as f32)
+  Pivot::Px(0.5 * TILE_WIDTH as f32, 0.625 * TILE_HEIGHT as f32)
 }
 
 pub fn draw(ctx: &mut Ctx, state: &State) {
-    for pos in state.board.iterator() {
-        draw_tile(ctx, state, pos);
-    }
+  for pos in state.board.iterator() {
+    draw_tile(ctx, state, pos);
+  }
 }
 
 fn draw_tile(ctx: &mut Ctx, state: &State, pos: Coords) {
-    let screen_pos = board_to_screen_position(pos);
-    let texture = state.assets.tile.unwrap();
-    let texture_id = texture.id;
-    kit::draw_image(ctx, texture_id, screen_pos, SCALE, pivot_px());
+  let screen_pos = board_to_screen_position(pos);
+  let texture = state.assets.tile.unwrap();
+  let texture_id = texture.id;
+  kit::draw_image(ctx, texture_id, screen_pos, SCALE, pivot_px());
 }
